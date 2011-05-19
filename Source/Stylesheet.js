@@ -6,7 +6,7 @@ description: js stylesheet
 license: MIT-Style License (http://mifjs.net/license.txt)
 copyright: Anton Samoylov (http://mifjs.net)
 authors: Anton Samoylov (http://mifjs.net)
-requires: core:1.2.4:*
+requires: core:1.3:*
 provides: Stylesheet
  
 ...
@@ -17,7 +17,8 @@ var Stylesheet = new Class({
 	
 	version: '0.9',
  
-	initialize: function(){
+	initialize: function(doc){
+		this.document = doc || document;
 		this.createSheet();
 		this.rules = {};
 		this.styles = {};
@@ -26,7 +27,7 @@ var Stylesheet = new Class({
 	},
  
 	createSheet: function(){
-		var style = new Element('style').inject(document.head);
+		var style = new Element('style').inject(this.document.head);
 		this.sheet = style.styleSheet || style.sheet;
 	},
  
@@ -39,7 +40,7 @@ var Stylesheet = new Class({
 			}, this);
 			return this;
 		}
-		var styles = ($type(styles) == 'string') ? styles : this.stylesToString(styles);
+		var styles = Type.isString(styles) ? styles : this.stylesToString(styles);
 		if(!styles) return;
 		var sheet = this.sheet;
 		if(sheet.addRule){
@@ -70,7 +71,7 @@ var Stylesheet = new Class({
  
 	removeRule: function(index){
 		var sheet = this.sheet;
-		if($type(index) == 'string'){
+		if(Type.isString(index)){
 			var selector = index.trim();
 			if(selector.contains(',')){
 				var selectors = selector.split(',');
@@ -91,11 +92,11 @@ var Stylesheet = new Class({
 	},
  
 	getRule: function(selector){
-		return $type(selector) == 'string' ? this.rules[selector] : this.getRules()[selector];
+		return Type.isString(selector) ? this.rules[selector] : this.getRules()[selector];
 	},
  
 	getRules: function(){
-		return $A(this.sheet.cssRules || this.sheet.rules);
+		return Array.from(this.sheet.cssRules || this.sheet.rules);
 	}
 	
 });
